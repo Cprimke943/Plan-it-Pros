@@ -1,56 +1,46 @@
-'use client'
-import Item from "./Item";
-import Link from 'next/link';
-import {useState, useEffect} from 'react';
+import React from 'react';
+import { IEvent } from '../models/itemSchema';
 
-   export default function Items() {
+interface ItemsProps {
+  events: IEvent[];
+}
 
-    const [UGAitems, setItems] = useState([]);
-  
-   useEffect(() => {
-      const fetchItems = async () => {
-        try {
-          const response = await fetch('/api/items');
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-           setItems(data.items);
-        
-           console.log(UGAitems);
-        } catch (error) {
-              console.log('Error from ShowItemList:', error);
-        }
-      };
-  
-      fetchItems();
-    }, []);
-
+const Items: React.FC<ItemsProps> = ({ events }) => {
+  if (!events || events.length === 0) {
     return (
-    
-        <section className='px-4 py-6'>
-            <div className='container-xl lg:container m-auto px-4 py-6'>
-
- 
-                {UGAitems.length === 0 ? (
-                    <p>No UGA items available</p>
-                ) : (
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                        {UGAitems.map((item, k) => (  
-                        <Item item={item} key={k}  />
-                    ))}
-                        
-                    </div>
-                )}
-            
-            <Link href={`/create-item`}
-                   className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800 mt-4 inline-block"
-                   
-                > Create New Item
-                </Link>
-            </div>
-        </section>
-
+      <div className="flex justify-center items-center py-8">
+        <p className="text-xl font-bold text-white bg-black bg-opacity-70 p-4 rounded-xl">
+          No events found.
+        </p>
+      </div>
     );
-    
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      {events.map((event) => (
+        <div key={event._id.toString()} className="border p-4 rounded-md bg-white bg-opacity-90">
+          <h2 className="font-bold text-xl mb-2 text-gray-800">{event.name}</h2>
+          <p>
+            <span className="font-bold text-black">Location:</span>{' '}
+            <span className="text-gray-700">{event.location}</span>
+          </p>
+          <p>
+            <span className="font-bold text-black">Date:</span>{' '}
+            <span className="text-gray-700">{new Date(event.date).toLocaleDateString()}</span>
+          </p>
+          <p>
+            <span className="font-bold text-black">Time:</span>{' '}
+            <span className="text-gray-700">{event.time}</span>
+          </p>
+          {/* Placeholder for event photo */}
+          <div className="mt-2 h-40 w-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-500">Event Photo</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
+
+export default Items;

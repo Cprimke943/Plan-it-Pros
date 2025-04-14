@@ -1,29 +1,20 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
-// Mongoose provides properties such as the _id in Document, we extend this
-interface IItem extends Document {
-  owner: number;
-  title: string;
-  description?: string;
-  url?: string;
+export interface IEvent extends Document {
+  name: string;
+  location: string;
+  date: Date;
+  time: string;
+  photo?: string; // Optional field for a photo URL
 }
 
-const itemSchema = new Schema<IItem>({
-  owner: {
-    type: Number,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
-  url: {
-    type: String,
-    required: false,
-  },
+const eventSchema: Schema<IEvent> = new Schema({
+  name: { type: String, required: true },
+  location: { type: String, required: true },
+  date: { type: Date, required: true },
+  time: { type: String, required: true },
+  photo: { type: String } // Optional field for a photo URL
 });
 
-const Item: Model<IItem> = mongoose.models.Item || mongoose.model<IItem>("Item", itemSchema);
-export default Item;
+// The third parameter 'Planevents' tells Mongoose to use that collection name exactly.
+export default mongoose.models.Event || mongoose.model<IEvent>('Event', eventSchema, 'Planevents');
