@@ -4,9 +4,11 @@ import Image from 'next/image';
 import logo from '../assets/icon.jpg';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter(); // Initialize the router
 
   // Read login state on mount
   useEffect(() => {
@@ -21,6 +23,13 @@ const Navbar = () => {
     const newLoginState = !isLoggedIn;
     setIsLoggedIn(newLoginState);
     localStorage.setItem('isLoggedIn', newLoginState.toString());
+
+    // Navigate based on login state
+    if (newLoginState) {
+      router.push('/your-events'); // Navigate to "Your Events" when logging in
+    } else {
+      router.push('/'); // Navigate to home when logging out
+    }
   };
 
   return (
