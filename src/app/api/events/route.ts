@@ -1,35 +1,61 @@
-import { NextResponse } from 'next/server';
+// app/api/events/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '../../../../config/mongodb';
 import Event from '../../../models/itemSchema';
 
-export async function GET(request: Request) {
+// 🔍 This is the updated GET handler (FILTERING INCLUDED)
+export async function GET(request: NextRequest) {
   await dbConnect();
 
-  // Parse the search parameters from the URL.
   const { searchParams } = new URL(request.url);
-  const location = searchParams.get('location') || '';
-  const dateParam = searchParams.get('date');
-  let filter: any = {};
+  const location = searchParams.get('location');
+  const date = searchParams.get('date');
+
+  const filter: any = {};
 
   if (location) {
+    // Case-insensitive partial match for location
     filter.location = { $regex: location, $options: 'i' };
   }
-  
-  if (dateParam) {
-    const queryDate = new Date(dateParam);
-    if (!isNaN(queryDate.getTime())) {
-      const nextDay = new Date(queryDate);
-      nextDay.setDate(queryDate.getDate() + 1);
-      filter.date = { $gte: queryDate, $lt: nextDay };
-    }
+
+  if (date) {
+    const start = new Date(date);
+    const end = new Date(date);
+    end.setDate(start.getDate() + 1);
+    filter.date = { $gte: start, $lt: end };
   }
 
   try {
-    const events = await Event.find(filter);
+    const events = await Event.find(filter).sort({ date: 1, time: 1 });
     return NextResponse.json(events, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
-      { message: 'Failed to fetch events', error: error.message },
+      { message: 'Error fetching events', error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+// ✅ Keep your POST handler too (for creating new events)
+export async function POST(request: Request) {
+  await dbConnect();
+
+  const body = await request.json();
+
+  try {
+    const newEvent = new Event({
+      name: body.name,
+      location: body.location,
+      date: new Date(body.date),
+      time: body.time,
+      photo: body.photo || null,
+    });
+
+    const saved = await newEvent.save();
+    return NextResponse.json({ message: 'Event created', event: saved }, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: 'Error creating event', error: error.message },
       { status: 500 }
     );
   }

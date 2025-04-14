@@ -21,11 +21,18 @@ const Items: React.FC<ItemsProps> = ({ events }) => {
       {events.map((event) => (
         <div key={event._id.toString()} className="border p-4 rounded-md bg-white bg-opacity-90">
           <h2 className="font-bold text-xl mb-2 text-gray-800">{event.name}</h2>
-          <p className="text-gray-700">Location: {event.location}</p>
-          <p className="text-gray-700">
-            Date: {new Date(event.date).toLocaleDateString()}
+          <p>
+            <span className="font-bold text-black">Location:</span>{' '}
+            <span className="text-gray-700">{event.location}</span>
           </p>
-          <p className="text-gray-700">Time: {event.time}</p>
+          <p>
+            <span className="font-bold text-black">Date:</span>{' '}
+            <span className="text-gray-700">{new Date(event.date).toLocaleDateString()}</span>
+          </p>
+          <p>
+            <span className="font-bold text-black">Time:</span>{' '}
+            <span className="text-gray-700">{event.time}</span>
+          </p>
           {/* Placeholder for event photo */}
           <div className="mt-2 h-40 w-full bg-gray-200 flex items-center justify-center">
             <span className="text-gray-500">Event Photo</span>
