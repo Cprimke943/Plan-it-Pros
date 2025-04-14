@@ -36,20 +36,27 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ✅ Keep your POST handler too (for creating new events)
 export async function POST(request: Request) {
   await dbConnect();
 
   const body = await request.json();
 
+  // ✅ Parse "YYYY-MM-DD" as a local date without time zone offset
+  const [year, month, day] = body.date.split('-').map(Number);
+  const localDateOnly = new Date(year, month - 1, day); // months are 0-indexed
+
   try {
+    const userId = body.owner || 'unknown'; // fallback for now
+
     const newEvent = new Event({
       name: body.name,
       location: body.location,
-      date: new Date(body.date),
+      date: localDateOnly,
       time: body.time,
       photo: body.photo || null,
+      owner: userId, // ✅ now saving who created it
     });
+
 
     const saved = await newEvent.save();
     return NextResponse.json({ message: 'Event created', event: saved }, { status: 201 });

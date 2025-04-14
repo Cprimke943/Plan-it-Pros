@@ -13,7 +13,8 @@ const eventSchema: Schema<IEvent> = new Schema({
   location: { type: String, required: true },
   date: { type: Date, required: true },
   time: { type: String, required: true },
-  photo: { type: String } // Optional field for a photo URL
+  photo: { type: String },
+  owner: { type: String, required: true }, // ✅ new field for logged-in user
 });
 
 // The third parameter 'Planevents' tells Mongoose to use that collection name exactly.

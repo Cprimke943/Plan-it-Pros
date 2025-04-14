@@ -27,16 +27,35 @@ const Items: React.FC<ItemsProps> = ({ events }) => {
           </p>
           <p>
             <span className="font-bold text-black">Date:</span>{' '}
-            <span className="text-gray-700">{new Date(event.date).toLocaleDateString()}</span>
+            <span className="text-gray-700">{new Date(event.date).toLocaleDateString('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+})
+}</span>
           </p>
           <p>
             <span className="font-bold text-black">Time:</span>{' '}
-            <span className="text-gray-700">{event.time}</span>
+            <span className="text-gray-700">{new Date(`1970-01-01T${event.time}`).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+              })}
+            </span>
+
           </p>
           {/* Placeholder for event photo */}
-          <div className="mt-2 h-40 w-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">Event Photo</span>
-          </div>
+          {event.photo ? (
+  <img
+    src={event.photo}
+    alt="Event"
+    className="mt-2 h-40 w-full object-cover rounded-md"
+  />
+) : (
+  <div className="mt-2 h-40 w-full bg-gray-200 flex items-center justify-center rounded-md">
+    <span className="text-gray-500">Event Photo</span>
+  </div>
+)}
+
         </div>
       ))}
     </div>
