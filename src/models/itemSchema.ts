@@ -6,6 +6,7 @@ export interface IEvent extends Document {
   date: Date;
   time: string;
   photo?: string; // Optional field for a photo URL
+  owner: string;
 }
 
 const eventSchema: Schema<IEvent> = new Schema({
