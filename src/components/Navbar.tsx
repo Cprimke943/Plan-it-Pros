@@ -1,31 +1,33 @@
 'use client';
 
+
+
 import Image from 'next/image';
 import logo from '../assets/icon.jpg';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { doLogout } from '@/app/actions';
+import {useSession, signOut} from "next-auth/react";
+//Session import goes here
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const { data:session, status} = useSession();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!session?.user);
   const router = useRouter();
 
   useEffect(() => {
-    const storedLogin = localStorage.getItem('loggedIn');
-    setIsLoggedIn(storedLogin === 'true');
-  }, []);
+    setIsLoggedIn(!!session?.user);
+  }, [session]);
 
   const handleLogin = () => {
-    localStorage.setItem('loggedIn', 'true');
-    localStorage.setItem('userId', 'demo-user-123'); // 🔐 fake user ID
-    setIsLoggedIn(true);
+   <Link href="/login" />
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('loggedIn');
-    localStorage.removeItem('userId');
+    doLogout();
     setIsLoggedIn(false);
-    router.push('/');
   };
 
   return (
@@ -58,6 +60,12 @@ const Navbar = () => {
               >
                 Search
               </Link>
+              <Link href="/login">
+  <button className="text-white bg-black hover:bg-white hover:text-black rounded-md px-3 py-2">
+    Login
+  </button>
+</Link>
+
               {isLoggedIn && (
                 <Link
                   href="/your-events"
@@ -69,13 +77,12 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right section: login/logout */}
           <div className="hidden md:block">
             <button
               onClick={isLoggedIn ? handleLogout : handleLogin}
               className="text-white bg-black hover:bg-white hover:text-black rounded-md px-3 py-2"
             >
-              {isLoggedIn ? 'Logout' : 'Login | Register'}
+              {isLoggedIn ? 'Logout' : 'Login or Register'}
             </button>
           </div>
         </div>
