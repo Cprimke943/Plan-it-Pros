@@ -1,21 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IEvent extends Document {
-  name: string;
-  location: string;
-  date: Date;
-  time: string;
-  photo?: string; // Optional field for a photo URL
-  owner: string;
-}
-
-const eventSchema: Schema<IEvent> = new Schema({
+const eventSchema = new Schema({
   name: { type: String, required: true },
   location: { type: String, required: true },
   date: { type: Date, required: true },
   time: { type: String, required: true },
   photo: { type: String },
-  owner: { type: String, required: true }, // ✅ new field for logged-in user
+  owner: { type: String, required: true },
 });
 
 // The third parameter 'Planevents' tells Mongoose to use that collection name exactly.

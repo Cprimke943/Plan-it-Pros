@@ -1,29 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { authConfig } from "./auth.config";
-import NextAuth from "next-auth";
+// middleware.ts
+import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const {auth} = NextAuth(authConfig);
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-const middleware = async (request: NextRequest) => {
-    const {pathname} = request.nextUrl;
-    const session = await auth();
-    const isAuthenticated = !!session?.user;
-    console.log(isAuthenticated, pathname);
+  if (!token) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 
-    const publicPaths = ["/", "/api/items","/search", "/about", "/login", "/signup", ];
-
-    if(!isAuthenticated && !publicPaths.includes(pathname)) {
-        return NextResponse.redirect(new URL("/", request.url));
-
-    }
-
-    return NextResponse.next();
+  return NextResponse.next();
 }
 
+// Match routes that should be protected
 export const config = {
-    matcher: [
-        "/((?!_next|api|favicon.ico|images|static).*)"
-    ],
+  matcher: ["/your-events/:path*"],
 };
-
-export default middleware

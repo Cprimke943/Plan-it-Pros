@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Content from '../../../components/Content';
 
 const CreateEventPage = () => {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -25,16 +27,24 @@ const CreateEventPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!session?.user?.email) {
+      alert('You must be logged in to create an event.');
+      return;
+    }
+
     const res = await fetch('/api/events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({
+        ...formData,
+        owner: session.user.email, // ✅ Include logged-in user
+      }),
     });
 
     if (res.ok) {
-      router.push('/your-events'); // ✅ redirect after success
+      router.push('/your-events');
     } else {
       alert('Error creating event.');
     }

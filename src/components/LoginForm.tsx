@@ -1,63 +1,68 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { doCredentialLogin } from '@/app/actions';
 
 export default function LoginForm() {
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(''); // ✅ success message
   const router = useRouter();
+  const [form, setForm] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
 
-  async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-    try {
-      const formData = new FormData(event.currentTarget);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-      const response = await doCredentialLogin(formData);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      if (response?.error) {
-        console.error(response.error);
-        setError(response.error.message || 'An error occurred');
-        setSuccess('');
-      } else {
-        setError('');
-        setSuccess('Login successful! Redirecting...');
-        setTimeout(() => router.push('/'), 1000); // ✅ short delay to show message
-      }
-    } catch (e: any) {
-      console.error(e);
-      setError('Check your credentials');
-      setSuccess('');
+    const res = await signIn('credentials', {
+      redirect: false,
+      username: form.username,
+      password: form.password,
+      callbackUrl: '/your-events',
+    });
+
+    if (res?.error) {
+      setError('Invalid username or password');
+    } else {
+      router.push('/your-events');
     }
-  }
+  };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="border p-2 rounded"
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="border p-2 rounded"
-          required
-        />
+    <div className="max-w-md mx-auto mt-20 bg-white bg-opacity-90 p-6 rounded shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login to Your Account</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Username</label>
+          <input
+            type="text"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            required
+            className="w-full mt-1 p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#a88c66]"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full mt-1 p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#a88c66]"
+          />
+        </div>
+        {error && <p className="text-red-600 text-sm">{error}</p>}
         <button
           type="submit"
-          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          className="w-full bg-[#a88c66] hover:bg-[#977856] text-white font-semibold py-2 rounded transition"
         >
-          Log In
+          Login
         </button>
-        {error && <p className="text-red-600">{error}</p>}
-        {success && <p className="text-green-600">{success}</p>}
       </form>
     </div>
   );

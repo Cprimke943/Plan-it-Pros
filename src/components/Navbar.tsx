@@ -1,19 +1,16 @@
 'use client';
 
-
-
 import Image from 'next/image';
 import logo from '../assets/icon.jpg';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { doLogout } from '@/app/actions';
-import {useSession, signOut} from "next-auth/react";
-//Session import goes here
+import { useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
+
 
 const Navbar = () => {
-
-  const { data:session, status} = useSession();
+  const { data: session } = useSession();
   const [isLoggedIn, setIsLoggedIn] = useState(!!session?.user);
   const router = useRouter();
 
@@ -21,14 +18,10 @@ const Navbar = () => {
     setIsLoggedIn(!!session?.user);
   }, [session]);
 
-  const handleLogin = () => {
-   <Link href="/login" />
-  };
-
   const handleLogout = () => {
-    doLogout();
-    setIsLoggedIn(false);
+    signOut({ callbackUrl: '/' });
   };
+  
 
   return (
     <nav className="bg-[#a88c66] border-b-1">
@@ -60,12 +53,6 @@ const Navbar = () => {
               >
                 Search
               </Link>
-              <Link href="/login">
-  <button className="text-white bg-black hover:bg-white hover:text-black rounded-md px-3 py-2">
-    Login
-  </button>
-</Link>
-
               {isLoggedIn && (
                 <Link
                   href="/your-events"
@@ -77,13 +64,22 @@ const Navbar = () => {
             </div>
           </div>
 
+          {/* Right section: login/logout */}
           <div className="hidden md:block">
-            <button
-              onClick={isLoggedIn ? handleLogout : handleLogin}
-              className="text-white bg-black hover:bg-white hover:text-black rounded-md px-3 py-2"
-            >
-              {isLoggedIn ? 'Logout' : 'Login or Register'}
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="text-white bg-black hover:bg-white hover:text-black rounded-md px-3 py-2"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link href="/login">
+                <button className="text-white bg-black hover:bg-white hover:text-black rounded-md px-3 py-2">
+                  Login / Register
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
