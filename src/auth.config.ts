@@ -24,18 +24,18 @@ export const authConfig: AuthOptions = {
         const user = await User.findOne({ username });
 
         if (!user) {
-          console.log("❌ User not found");
+          console.log("User not found");
           return null;
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
         if (!isPasswordCorrect) {
-          console.log("❌ Invalid password");
+          console.log("Invalid password");
           return null;
         }
 
-        // ✅ Return a plain object to avoid serialization issues
+        // Return a plain object to avoid serialization issues
         return {
           id: user._id.toString(),
           name: user.username,
@@ -45,8 +45,8 @@ export const authConfig: AuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/login", // optional: custom login route
-    error: "/login",  // optional: redirect back on error
+    signIn: "/login",
+    error: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {

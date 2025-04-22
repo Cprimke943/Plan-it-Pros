@@ -1,21 +1,21 @@
 // app/api/events/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '../../../../config/mongodb';
-import Event from '../../../models/itemSchema';
+import { NextRequest, NextResponse } from "next/server";
+import dbConnect from "../../../../config/mongodb";
+import Event from "../../../models/itemSchema";
 
-// 🔍 This is the updated GET handler (FILTERING INCLUDED)
+//  GET handler
 export async function GET(request: NextRequest) {
   await dbConnect();
 
   const { searchParams } = new URL(request.url);
-  const location = searchParams.get('location');
-  const date = searchParams.get('date');
+  const location = searchParams.get("location");
+  const date = searchParams.get("date");
 
   const filter: any = {};
 
   if (location) {
     // Case-insensitive partial match for location
-    filter.location = { $regex: location, $options: 'i' };
+    filter.location = { $regex: location, $options: "i" };
   }
 
   if (date) {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(events, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
-      { message: 'Error fetching events', error: error.message },
+      { message: "Error fetching events", error: error.message },
       { status: 500 }
     );
   }
@@ -41,12 +41,11 @@ export async function POST(request: Request) {
 
   const body = await request.json();
 
-  // ✅ Parse "YYYY-MM-DD" as a local date without time zone offset
-  const [year, month, day] = body.date.split('-').map(Number);
-  const localDateOnly = new Date(year, month - 1, day); // months are 0-indexed
+  const [year, month, day] = body.date.split("-").map(Number);
+  const localDateOnly = new Date(year, month - 1, day);
 
   try {
-    const userId = body.owner || 'unknown'; // fallback for now
+    const userId = body.owner || "unknown";
 
     const newEvent = new Event({
       name: body.name,
@@ -54,15 +53,17 @@ export async function POST(request: Request) {
       date: localDateOnly,
       time: body.time,
       photo: body.photo || null,
-      owner: userId, // ✅ now saving who created it
+      owner: userId,
     });
 
-
     const saved = await newEvent.save();
-    return NextResponse.json({ message: 'Event created', event: saved }, { status: 201 });
+    return NextResponse.json(
+      { message: "Event created", event: saved },
+      { status: 201 }
+    );
   } catch (error: any) {
     return NextResponse.json(
-      { message: 'Error creating event', error: error.message },
+      { message: "Error creating event", error: error.message },
       { status: 500 }
     );
   }

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 const eventSchema = new Schema({
   name: { type: String, required: true },
@@ -9,5 +9,5 @@ const eventSchema = new Schema({
   owner: { type: String, required: true },
 });
 
-// The third parameter 'Planevents' tells Mongoose to use that collection name exactly.
-export default mongoose.models.Event || mongoose.model<IEvent>('Event', eventSchema, 'Planevents');
+export default mongoose.models.Event ||
+  mongoose.model<IEvent>("Event", eventSchema, "Planevents");

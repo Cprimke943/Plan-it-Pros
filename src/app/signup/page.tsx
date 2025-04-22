@@ -1,4 +1,4 @@
-import SignupForm from "@/components/Signup"; // Assuming the form is in Signup.tsx
+import SignupForm from "@/components/Signup";
 import Link from "next/link";
 
 export default function SignupPage() {
